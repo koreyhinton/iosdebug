@@ -18,7 +18,7 @@ func ugly(makeVisible makeVisible: Bool = false, makeOpaque: Bool = false) {
         return
     }
     
-    guard let rootView = window?.rootViewController?.view else {
+    guard let root = window?.rootViewController else {
         print("failed to run ugly function, there isn't even a root view controller yet")
         return
     }
@@ -31,7 +31,7 @@ func ugly(makeVisible makeVisible: Bool = false, makeOpaque: Bool = false) {
         return UIColor(red: r/255.0, green: g/255.0, blue: b/255.0, alpha: 1)
     }
     
-    func traverse(view: UIView) {
+    func traverseView(view: UIView) {
         view.backgroundColor = randomColor()
         
         if makeOpaque {
@@ -42,9 +42,22 @@ func ugly(makeVisible makeVisible: Bool = false, makeOpaque: Bool = false) {
         }
         
         for subview in view.subviews {
-            traverse(subview)
+            traverseView(subview)
         }
     }
-    traverse(rootView)
+    
+    func traverseController(controller: UIViewController) {
+        
+        traverseView(controller.view)
+        
+        for child in controller.childViewControllers {
+            traverseController(child)
+        }
+        
+        if let presented = controller.presentedViewController {
+            traverseController(presented)
+        }
+    }
+    traverseController(root)
 }
 
